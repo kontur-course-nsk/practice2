@@ -1,0 +1,14 @@
+.vs
+.vscode
+.idea
+bin
+obj
+packages
+
+*.user
+*.suo
+*.bak
+*.cache
+*.[Rr]e[Ss]harper
+
+package-lock.json
