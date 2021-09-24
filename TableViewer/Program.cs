@@ -16,38 +16,45 @@ namespace TableViewer
                 return;
             }
 
-            var inputIntArray = inputString.Split(" ").Select(int.Parse).ToArray();
-
-            var rowCount = inputIntArray[0];
-            var columnWidths = inputIntArray[1..];
-            var tableView = GetTableView(rowCount, columnWidths);
+            var rows = inputString.Split(",")
+                .Select(it => it.Split(" ").Select(int.Parse).ToArray())
+                .ToArray();
+            var tableView = GetTableView(rows);
 
             Console.WriteLine(tableView);
             Console.Read();
         }
 
-        public static string GetTableView(int rowCount, int[] columnWidths)
+        public static string GetTableView(int[][] rows)
         {
-            if (rowCount <= 0 || rowCount > 100)
+            if (rows.Length <= 0 || rows.Length > 100)
             {
-                throw new ArgumentException("Wrong row count.", nameof(rowCount));
+                throw new ArgumentException("Wrong rows length.", nameof(rows));
             }
 
-            if (columnWidths.Length == 0 || columnWidths.Length > 100 || columnWidths.Any(it => it <= 0 || it > 100))
+            for (var i = 0; i < rows.Length; i++)
             {
-                throw new ArgumentException("Wrong column widths.", nameof(columnWidths));
+                if (rows[i].Length <= 0 || rows[i].Length > 100 || rows[i].Any(it => it <= 0 || it > 100))
+                {
+                    throw new ArgumentException("Wrong rows length.", $"row[{i}]");
+                }
+            }
+
+            if (rows.Any(it => it.Sum() != rows[0].Sum()))
+            {
+                throw new ArgumentException("All lines must have the same width.", nameof(rows));
             }
 
             var tableView = new StringBuilder();
 
-            var tableWidth = columnWidths.Sum() + columnWidths.Length + 1;
+            var tableWidth = rows[0].Sum() + rows[0].Length + 1;
             var line = string.Join("", Enumerable.Repeat("*", tableWidth));
             tableView.AppendLine(line);
 
-            for (var rowIndex = 0; rowIndex < rowCount; rowIndex++)
+            foreach (var row in rows)
             {
                 tableView.Append("*");
-                foreach (var columnWidth in columnWidths)
+                foreach (var columnWidth in row)
                 {
                     tableView.Append(string.Join("", Enumerable.Repeat(" ", columnWidth)));
                     tableView.Append("*");
